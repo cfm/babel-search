@@ -5,6 +5,8 @@ use std::io;
 use std::io::Write;
 use std::time::Instant;
 
+const REPORT_EVERY: i32 = 100;
+
 fn report(&start: &Instant, found: &HashMap<String, i32>, partials: &HashMap<String, i32>) {
     let now = Instant::now();
     let duration = now - start;
@@ -35,10 +37,15 @@ fn main() {
 
         for needle in &needles {
             if needle.starts_with(&partial) {
-                partials
-                    .entry(partial.clone())
-                    .and_modify(|count| *count += 1)
-                    .or_insert(1);
+                if partial.len() > 1 {
+                    let count = partials
+                        .entry(partial.clone())
+                        .and_modify(|count| *count += 1)
+                        .or_insert(1);
+                    if *count % REPORT_EVERY == 0 {
+                        report(&start, &found, &partials);
+                    }
+                }
                 highlight = true;
 
                 if *needle == partial {
