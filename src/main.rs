@@ -1,3 +1,4 @@
+use colored::*;
 use rand::Rng;
 use std::io;
 use std::io::Write;
@@ -19,11 +20,17 @@ fn main() {
         for needle in &needles {
             if needle.starts_with(&partial) {
                 highlight = true;
-                print!("!");
             }
         }
 
-        print!("{}", letter);
+        print!(
+            "{}",
+            if highlight {
+                letter.to_string().reversed()
+            } else {
+                letter.to_string().normal()
+            }
+        );
         io::stdout().flush().unwrap();
         thread::sleep(WAIT);
     }
