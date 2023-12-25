@@ -1,6 +1,6 @@
 use colored::*;
 use rand::Rng;
-use std::collections::HashSet;
+use std::collections::HashMap;
 use std::io;
 use std::io::Write;
 use std::thread;
@@ -10,7 +10,7 @@ const WAIT: Duration = Duration::from_millis(10); // 0.1 sec
 
 fn main() {
     let needles: Vec<String> = vec!["foo".into(), "bar".into()];
-    let mut found = HashSet::new();
+    let mut found = HashMap::new();
 
     let mut rng = rand::thread_rng();
     let mut search = "".to_string();
@@ -24,7 +24,10 @@ fn main() {
                 highlight = true;
 
                 if *needle == partial {
-                    found.insert(needle);
+                    found
+                        .entry(needle)
+                        .and_modify(|count| *count += 1)
+                        .or_insert(1);
                     search = "".to_string()
                 } else {
                     search = partial.clone();
@@ -48,5 +51,5 @@ fn main() {
         thread::sleep(WAIT);
     }
 
-    println!();
+    println!("\nFound {:?}", found);
 }
