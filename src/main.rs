@@ -12,6 +12,7 @@ fn main() {
     let start = Instant::now();
     let needles: Vec<String> = vec!["foo".into(), "bar".into()];
     let mut found = HashMap::new();
+    let mut partials = HashMap::new();
 
     let mut rng = rand::thread_rng();
     let mut search = "".to_string();
@@ -22,6 +23,10 @@ fn main() {
 
         for needle in &needles {
             if needle.starts_with(&partial) {
+                partials
+                    .entry(partial.clone())
+                    .and_modify(|count| *count += 1)
+                    .or_insert(1);
                 highlight = true;
 
                 if *needle == partial {
@@ -54,5 +59,14 @@ fn main() {
 
     let finish = Instant::now();
     let duration = finish - start;
-    println!("\nFound {:?} in {} sec", found, duration.as_secs());
+    println!(
+        "{}",
+        format!(
+            "\nFound {:?} in {} sec in {:?}",
+            found,
+            duration.as_secs(),
+            partials
+        )
+        .bold()
+    );
 }
