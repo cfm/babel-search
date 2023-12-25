@@ -4,11 +4,12 @@ use std::collections::HashMap;
 use std::io;
 use std::io::Write;
 use std::thread;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 const WAIT: Duration = Duration::from_millis(10); // 0.1 sec
 
 fn main() {
+    let start = Instant::now();
     let needles: Vec<String> = vec!["foo".into(), "bar".into()];
     let mut found = HashMap::new();
 
@@ -51,5 +52,7 @@ fn main() {
         thread::sleep(WAIT);
     }
 
-    println!("\nFound {:?}", found);
+    let finish = Instant::now();
+    let duration = finish - start;
+    println!("\nFound {:?} in {} sec", found, duration.as_secs());
 }
