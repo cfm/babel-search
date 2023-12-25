@@ -5,7 +5,7 @@ use std::io::Write;
 use std::thread;
 use std::time::Duration;
 
-const WAIT: Duration = Duration::from_millis(100); // 0.1 sec
+const WAIT: Duration = Duration::from_millis(10); // 0.1 sec
 
 fn main() {
     let needles: Vec<String> = vec!["foo".into(), "bar".into()]; // TODO: track progress
