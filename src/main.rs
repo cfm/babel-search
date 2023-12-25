@@ -3,10 +3,7 @@ use rand::Rng;
 use std::collections::HashMap;
 use std::io;
 use std::io::Write;
-use std::thread;
-use std::time::{Duration, Instant};
-
-const WAIT: Duration = Duration::from_millis(10); // 0.1 sec
+use std::time::Instant;
 
 fn main() {
     let start = Instant::now();
@@ -54,7 +51,6 @@ fn main() {
             }
         );
         io::stdout().flush().unwrap();
-        thread::sleep(WAIT);
     }
 
     let finish = Instant::now();
