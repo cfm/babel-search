@@ -5,11 +5,26 @@ use std::io;
 use std::io::Write;
 use std::time::Instant;
 
+fn report(&start: &Instant, found: &HashMap<String, i32>, partials: &HashMap<String, i32>) {
+    let now = Instant::now();
+    let duration = now - start;
+    println!(
+        "{}",
+        format!(
+            "\nFound {:?} in {} sec in {:?}",
+            found,
+            duration.as_secs(),
+            partials
+        )
+        .bold()
+    );
+}
+
 fn main() {
     let start = Instant::now();
     let needles: Vec<String> = vec!["foo".into(), "bar".into()];
-    let mut found = HashMap::new();
-    let mut partials = HashMap::new();
+    let mut found: HashMap<String, i32> = HashMap::new();
+    let mut partials: HashMap<String, i32> = HashMap::new();
 
     let mut rng = rand::thread_rng();
     let mut search = "".to_string();
@@ -28,7 +43,7 @@ fn main() {
 
                 if *needle == partial {
                     found
-                        .entry(needle)
+                        .entry(needle.clone())
                         .and_modify(|count| *count += 1)
                         .or_insert(1);
                     search = "".to_string()
@@ -53,16 +68,5 @@ fn main() {
         io::stdout().flush().unwrap();
     }
 
-    let finish = Instant::now();
-    let duration = finish - start;
-    println!(
-        "{}",
-        format!(
-            "\nFound {:?} in {} sec in {:?}",
-            found,
-            duration.as_secs(),
-            partials
-        )
-        .bold()
-    );
+    report(&start, &found, &partials);
 }
