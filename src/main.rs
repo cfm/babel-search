@@ -44,12 +44,10 @@ fn main() {
     let mut found: Progress = HashMap::new();
     let mut partials: Progress = HashMap::new();
 
-    // How we search.
+    // Set up for the search and run it until we've found everything:
     let mut rng = rand::thread_rng();
     let mut search = "".to_string();
     let start = Instant::now();
-
-    // Until we've found everything:
     while found.len() < needles.len() {
         // Pull a new letter at random from [a, z].  Assume it's not a match for
         // our current search.
@@ -64,20 +62,6 @@ fn main() {
         for needle in &needles {
             // Do we have part of it?
             if needle.starts_with(&partial) {
-                // We get credit towards our progress only if it's more than the
-                // first letter.  ;-)
-                if partial.len() > 1 {
-                    let count = partials
-                        .entry(partial.clone())
-                        .and_modify(|count| *count += 1)
-                        .or_insert(1);
-                    if *count % REPORT_EVERY == 0 {
-                        report(&start, &found, &partials);
-                    }
-                }
-                // ...but it's a match no matter what!
-                highlight = true;
-
                 // Do we have the whole thing?
                 if *needle == partial {
                     found
@@ -86,9 +70,24 @@ fn main() {
                         .or_insert(1);
                     search = "".to_string()
                 } else {
+                    // We get credit towards our progress only if it's more than
+                    // the first letter.  ;-)
+                    if partial.len() > 1 {
+                        let count = partials
+                            .entry(partial.clone())
+                            .and_modify(|count| *count += 1)
+                            .or_insert(1);
+                        if *count % REPORT_EVERY == 0 {
+                            report(&start, &found, &partials);
+                        }
+                    }
                     search = partial.clone();
                 }
+
+                // ...either way it's at least a partial match!
+                highlight = true;
                 break;
+
             // Nope; we'll keep going.
             } else {
                 highlight = false;
