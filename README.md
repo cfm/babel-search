@@ -1,11 +1,11 @@
 # babel-search
 
-A finite demonstration of the Library of Babel algorithm. Like [Tom Snelling's
-`babel`][tdjsnelling], this project is inspired by Jonathan Basile's [Library of
-Babel].
+A finite demonstration of the Library of Babel algorithm.
+
+---
 
 "Great," [Robin Myers] and [Daniel Lipara] said to me. "So we can browse
-Borges's Library of Babel: rooms upon rooms of shelves upon shelves of books
+Borges's [Library of Babel]: rooms upon rooms of shelves upon shelves of books
 upon books. All the books that have ever been written and all the books that
 ever will be written. But what _are_ the books? How do they get written?"
 
@@ -66,8 +66,36 @@ Found {"daniel": 1} in 212 sec in {"dan": 6665, "da": 175089, "danie": 10, "dani
 "That slowly," I said.
 
 [Daniel Lipara]: https://latinamericanliteraturetoday.org/lal_author/daniel-lipara/
-[Library of Babel]: https://libraryofbabel.info/
 [Robin Myers]: https://www.robinepmyers.com
 [tdjsnelling]: https://github.com/tdjsnelling/babel
 
 _Buenos Aires and Vermont, December 2023_
+
+## Limitations
+
+For the purposes of demonstration, this program:
+
+- Uses words only in lowercase letters.
+
+```sh-session
+$ cargo run -- X
+bocwdoybjscmx
+Found {"x": 1} in 0 sec in {}
+```
+
+- Ignores spaces, but you can do either of the following:
+
+```sh-session
+$ cargo run -- fi fy fo fum  # 710 letters later...
+Found {"fi": 27, "fy": 26, "fo": 32, "fum": 1} in 0 sec in {"fu": 31}
+```
+
+```sh-session
+$ cargo run -- itwasadarkandstormynight  # In half an hour, we got only to "itwasa"!
+```
+
+## Acknowledgments
+
+This experiment was inspired by Jonathan Basile's [Library of Babel].
+
+[Library of Babel]: https://libraryofbabel.info/
