@@ -1,6 +1,7 @@
 use colored::*;
 use rand::Rng;
 use std::collections::HashMap;
+use std::env;
 use std::io;
 use std::io::Write;
 use std::time::Instant;
@@ -24,7 +25,8 @@ fn report(&start: &Instant, found: &HashMap<String, i32>, partials: &HashMap<Str
 
 fn main() {
     let start = Instant::now();
-    let needles: Vec<String> = vec!["foo".into(), "bar".into()];
+    let mut needles: Vec<String> = env::args().collect();
+    needles.swap_remove(0);
     let mut found: HashMap<String, i32> = HashMap::new();
     let mut partials: HashMap<String, i32> = HashMap::new();
 
