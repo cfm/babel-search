@@ -1,3 +1,5 @@
+#![deny(clippy::all)]
+
 use colored::*;
 use rand::Rng;
 use std::collections::HashMap;
