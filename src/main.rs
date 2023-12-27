@@ -6,12 +6,14 @@ use std::io;
 use std::io::Write;
 use std::time::Instant;
 
-const REPORT_EVERY: i32 = 100;
-
+type Count = i32;
 type Needles = Vec<String>;
+type Progress = HashMap<String, Count>;
 
-/// The needles we'll search for are our command-line arguments, converted to
-/// lowercase and stripped of whitespace.
+const REPORT_EVERY: Count = 100;
+
+/// Helper function to gather our needles: our command-line arguments, converted
+/// to lowercase and stripped of whitespace.
 fn gather_needles() -> Needles {
     let mut needles: Vec<String> = env::args().skip(1).map(|s| s.to_lowercase()).collect();
     needles
@@ -20,7 +22,8 @@ fn gather_needles() -> Needles {
     needles
 }
 
-fn report(&start: &Instant, found: &HashMap<String, i32>, partials: &HashMap<String, i32>) {
+/// Helper function to report our progress along the way and at the end.
+fn report(&start: &Instant, found: &Progress, partials: &Progress) {
     let now = Instant::now();
     let duration = now - start;
     println!(
@@ -36,20 +39,33 @@ fn report(&start: &Instant, found: &HashMap<String, i32>, partials: &HashMap<Str
 }
 
 fn main() {
-    let start = Instant::now();
+    // What we're searching for and how much progress we've made.
     let needles = gather_needles();
-    let mut found: HashMap<String, i32> = HashMap::new();
-    let mut partials: HashMap<String, i32> = HashMap::new();
+    let mut found: Progress = HashMap::new();
+    let mut partials: Progress = HashMap::new();
 
+    // How we search.
     let mut rng = rand::thread_rng();
     let mut search = "".to_string();
+    let start = Instant::now();
+
+    // Until we've found everything:
     while found.len() < needles.len() {
+        // Pull a new letter at random from [a, z].  Assume it's not a match for
+        // our current search.
         let letter: char = rng.gen_range('a'..='z');
-        let partial = search.to_owned() + &letter.to_string();
         let mut highlight = false;
 
+        // The partial sequence we're searching for: at least the current
+        // character, appended to however far we've gotten so far.
+        let partial = search.to_owned() + &letter.to_string();
+
+        // For every needle we're searching for:
         for needle in &needles {
+            // Do we have part of it?
             if needle.starts_with(&partial) {
+                // We get credit towards our progress only if it's more than the
+                // first letter.  ;-)
                 if partial.len() > 1 {
                     let count = partials
                         .entry(partial.clone())
@@ -59,8 +75,10 @@ fn main() {
                         report(&start, &found, &partials);
                     }
                 }
+                // ...but it's a match no matter what!
                 highlight = true;
 
+                // Do we have the whole thing?
                 if *needle == partial {
                     found
                         .entry(needle.clone())
@@ -71,12 +89,15 @@ fn main() {
                     search = partial.clone();
                 }
                 break;
+            // Nope; we'll keep going.
             } else {
                 highlight = false;
                 search = "".to_string();
             }
         }
 
+        // Print the current character: highlighted if it's part of a match;
+        // otherwise normal.
         print!(
             "{}",
             if highlight {
