@@ -8,6 +8,18 @@ use std::time::Instant;
 
 const REPORT_EVERY: i32 = 100;
 
+type Needles = Vec<String>;
+
+/// The needles we'll search for are our command-line arguments, converted to
+/// lowercase and stripped of whitespace.
+fn gather_needles() -> Needles {
+    let mut needles: Vec<String> = env::args().skip(1).map(|s| s.to_lowercase()).collect();
+    needles
+        .iter_mut()
+        .for_each(|s| s.retain(|c| !c.is_whitespace()));
+    needles
+}
+
 fn report(&start: &Instant, found: &HashMap<String, i32>, partials: &HashMap<String, i32>) {
     let now = Instant::now();
     let duration = now - start;
@@ -25,8 +37,7 @@ fn report(&start: &Instant, found: &HashMap<String, i32>, partials: &HashMap<Str
 
 fn main() {
     let start = Instant::now();
-    let mut needles: Vec<String> = env::args().collect();
-    needles.swap_remove(0);
+    let needles = gather_needles();
     let mut found: HashMap<String, i32> = HashMap::new();
     let mut partials: HashMap<String, i32> = HashMap::new();
 
