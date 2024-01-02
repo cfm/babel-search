@@ -1,6 +1,6 @@
 # babel-search
 
-A finite demonstration of the Library of Babel algorithm.
+[Library of Babel] as literary [halting problem].
 
 ---
 
@@ -98,4 +98,5 @@ $ cargo run -- itwasadarkandstormynight  # In half an hour, we got only to "itwa
 
 This experiment was inspired by Jonathan Basile's [Library of Babel].
 
+[halting problem]: https://en.wikipedia.org/wiki/Halting_problem
 [Library of Babel]: https://libraryofbabel.info/
