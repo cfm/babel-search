@@ -2,26 +2,31 @@
 
 use colored::*;
 use rand::Rng;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::env;
 use std::io;
 use std::io::Write;
+use std::iter::FromIterator;
 use std::time::Instant;
 
 type Count = i32;
-type Needles = Vec<String>;
+type Needles = HashSet<String>;
 type Progress = HashMap<String, Count>;
 
 const REPORT_EVERY: Count = 100;
 
-/// Helper function to gather our needles: our command-line arguments, converted
-/// to lowercase and stripped of whitespace.
+/// Helper function to read search needles from the command-line arguments.
 fn gather_needles() -> Needles {
+    // (1) Convert to lowercase.
     let mut needles: Vec<String> = env::args().skip(1).map(|s| s.to_lowercase()).collect();
+
+    // (2) Remove whitespace.
     needles
         .iter_mut()
         .for_each(|s| s.retain(|c| !c.is_whitespace()));
-    needles
+
+    // (3) Finally, convert to a set to deduplicate, especially after (1) and (2).
+    Needles::from_iter(needles)
 }
 
 /// Helper function to report our progress along the way and at the end.
