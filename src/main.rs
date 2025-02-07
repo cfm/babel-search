@@ -52,13 +52,13 @@ fn main() {
     let mut partials: Progress = HashMap::new();
 
     // Set up for the search and run it until we've found everything:
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
     let mut search = "".to_string();
     let start = Instant::now();
     while found.len() < needles.len() {
         // Pull a new letter at random from [a, z].  Assume it's not a match for
         // our current search.
-        let letter: char = rng.gen_range('a'..='z');
+        let letter: char = rng.random_range('a'..='z');
         let mut highlight = false;
 
         // The partial sequence we're searching for: at least the current
