@@ -1,7 +1,7 @@
 #![deny(clippy::all)]
 
 use colored::*;
-use rand::Rng;
+use rand::RngExt;
 use std::collections::{HashMap, HashSet};
 use std::env;
 use std::io;
