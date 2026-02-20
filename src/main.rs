@@ -1,9 +1,10 @@
 #![deny(clippy::all)]
 
+use clap::Parser;
 use colored::*;
 use rand::RngExt;
 use std::collections::{HashMap, HashSet};
-use std::env;
+use std::fs;
 use std::io;
 use std::io::Write;
 use std::iter::FromIterator;
@@ -15,18 +16,42 @@ type Progress = HashMap<String, Count>;
 
 const REPORT_EVERY: Count = 100;
 
-/// Helper function to read search needles from the command-line arguments.
-fn gather_needles() -> Needles {
+/// Babel search: find words in a random stream of letters
+#[derive(Parser)]
+#[command(name = "babel-search")]
+#[command(about = "A Library of Babel search implementation")]
+struct Args {
+    /// Path to a dictionary file containing needles (one per line)
+    #[arg(long)]
+    dictionary: Option<String>,
+    
+    /// Words to search for (alternative to dictionary file)
+    needles: Vec<String>,
+}
+
+/// Helper function to read search needles from command-line arguments or dictionary file.
+fn gather_needles(args: &Args) -> Result<Needles, std::io::Error> {
+    let mut needles: Vec<String> = Vec::new();
+    
+    // If a dictionary file is provided, read from it
+    if let Some(dict_path) = &args.dictionary {
+        let contents = fs::read_to_string(dict_path)?;
+        needles.extend(contents.lines().map(|line| line.to_string()));
+    }
+    
+    // Also include command-line needles for backward compatibility
+    needles.extend(args.needles.iter().cloned());
+    
     // (1) Convert to lowercase.
-    let mut needles: Vec<String> = env::args().skip(1).map(|s| s.to_lowercase()).collect();
+    let mut needles: Vec<String> = needles.into_iter().map(|s| s.to_lowercase()).collect();
 
     // (2) Remove whitespace.
     needles
         .iter_mut()
         .for_each(|s| s.retain(|c| !c.is_whitespace()));
 
-    // (3) Finally, convert to a set to deduplicate, especially after (1) and (2).
-    Needles::from_iter(needles)
+    // (3) Filter out empty strings and convert to a set to deduplicate.
+    Ok(Needles::from_iter(needles.into_iter().filter(|s| !s.is_empty())))
 }
 
 /// Helper function to report our progress along the way and at the end.
@@ -46,8 +71,23 @@ fn report(&start: &Instant, found: &Progress, partials: &Progress) {
 }
 
 fn main() {
+    let args = Args::parse();
+    
     // What we're searching for and how much progress we've made.
-    let needles = gather_needles();
+    let needles = match gather_needles(&args) {
+        Ok(needles) => {
+            if needles.is_empty() {
+                eprintln!("Error: No needles provided. Use either --dictionary or provide words as arguments.");
+                std::process::exit(1);
+            }
+            needles
+        }
+        Err(e) => {
+            eprintln!("Error reading dictionary file: {}", e);
+            std::process::exit(1);
+        }
+    };
+    
     let mut found: Progress = HashMap::new();
     let mut partials: Progress = HashMap::new();
 
